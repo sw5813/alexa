@@ -23,8 +23,8 @@ def build_speechlet_response(title, output, reprompt_text, should_end_session):
         },
         'card': {
             'type': 'Simple',
-            'title': "SessionSpeechlet - " + str(title),
-            'content': "SessionSpeechlet - " + output
+            'title': str(title),
+            'content': output
         },
         'reprompt': {
             'outputSpeech': {
@@ -74,7 +74,9 @@ def handle_session_end_request():
 def get_answer(intent, session):
     """ Called when a question is asked in the middle of the session """
 
-    url = "https://www.google.com/search?q=" + intent['slots']['Question']['value']
+    question = intent['slots']['Question']['value']
+    card_title = question
+    url = "https://www.google.com/search?q=" + question
     headers = {'user-agent': 'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36'}
     result = requests.get(url, headers=headers)
 
@@ -90,7 +92,7 @@ def get_answer(intent, session):
     should_end_session = False
 
     return build_response(None, build_speechlet_response(
-        None, speech_output, None, should_end_session))
+        card_title, speech_output, None, should_end_session))
 
 
 # --------------- Events ------------------
