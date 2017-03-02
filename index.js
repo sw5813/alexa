@@ -50,6 +50,34 @@ LaunchPhoto.prototype.eventHandlers.onSessionStarted = function (sessionStartedR
 
 LaunchPhoto.prototype.eventHandlers.onLaunch = function (launchRequest, session, response) {
     console.log("LaunchPhoto onLaunch requestId: " + launchRequest.requestId + ", sessionId: " + session.sessionId);
+    getOutfitOpinion(function(rec) {
+        var comment;
+        if (rec == 1) {
+            comment = "Okay, please stand in front of the mirror so that I can see your outfit. Did you know that complimentary colors create the most vivid contrast in an outfit? But they can also clash very easily. Something to keep in mind when you're trying to get dressed in the morning.";
+        } else if (rec == 2) {
+            comment = "Sure thing, I've got you covered. Please stand in front of the mirror! One tip: triad colors create the most balanced form of contrast, which makes it a good scheme for an outfit with lots of pieces.";
+        } else if (rec == 3) {
+            comment = "Absolutely, I'm an expert! Can you stand in front of the mirror? Analogous colors, which are adjacent on the color wheel, create a minimuzed contrast, giving a very consistent look.";
+        } else if (rec == 4) {
+            comment = "For sure, all you need to do is to stand in front of the mirror, and I'll take a look. Tip of the day: you always have tints and shades to play with.";
+        } else {
+            comment = "Hmm, let me think about it, please stand in front of the mirror so that I can see your outfit. Keep in mind that mixing colors is very tricky; on the one hand, too few colors will look bland, but on the other hand, too many colors will make you look disorganized.";
+        }
+        
+        response.tell(comment);
+    });
+};
+
+LaunchPhoto.prototype.eventHandlers.onSessionEnded = function (sessionEndedRequest, session) {
+    console.log("LaunchPhoto onSessionEnded requestId: " + sessionEndedRequest.requestId
+        + ", sessionId: " + session.sessionId);
+    // any cleanup logic goes here
+};
+
+LaunchPhoto.prototype.intentHandlers = {
+    // register custom intent handlers
+    "ShouldTakePicIntent": function (intent, session, response) {
+        console.log("Getting outfit rec");
         getOutfitOpinion(function(rec) {
             var comment;
             if (rec == 1) {
@@ -66,23 +94,6 @@ LaunchPhoto.prototype.eventHandlers.onLaunch = function (launchRequest, session,
             
             response.tell(comment);
         });
-};
-
-LaunchPhoto.prototype.eventHandlers.onSessionEnded = function (sessionEndedRequest, session) {
-    console.log("LaunchPhoto onSessionEnded requestId: " + sessionEndedRequest.requestId
-        + ", sessionId: " + session.sessionId);
-    // any cleanup logic goes here
-};
-
-LaunchPhoto.prototype.intentHandlers = {
-    // register custom intent handlers
-    "ShouldTakePicIntent": function (intent, session, response) {
-        console.log("Getting outfit rec");
-        getOutfitOpinion(function(rec) {
-            var comment = "Eww, what are you wearing";
-            
-            response.tell(comment);
-        });
     },
     "AMAZON.HelpIntent": function (intent, session, response) {
         response.ask("Ask me for fashion advice", "Ask me for fashion advice");
@@ -91,7 +102,7 @@ LaunchPhoto.prototype.intentHandlers = {
 
 // Call shouldTakePhoto endpoint
 function getOutfitOpinion(eventCallback) {
-    var url = "http://54.161.179.203:8042/should-take-photo";
+    var url = "http://104.196.100.15:8042/should-take-photo";
 
     http.get(url, function(res) {
         var body = '';

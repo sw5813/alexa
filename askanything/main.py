@@ -53,7 +53,7 @@ def get_welcome_response():
 
     session_attributes = {}
     card_title = "Ask any question"
-    speech_output = "Sure"
+    speech_output = "What's up?"
     # If the user either does not reply to the welcome message or says something
     # that is not understood, they will be prompted again with this text.
     reprompt_text = ""
@@ -84,12 +84,14 @@ def get_answer(intent, session):
     soup = BeautifulSoup(result.text, "html.parser")
     speech_output = ""
     try:
-        speech_output = soup.find_all("div", {"class":"_OKe"})[0].find_all("div", {"class":"mod"})[-1].get_text()
+        speech_output = soup.find_all("div", {"class":"mod"})[0].get_text()
+        if speech_output[0] == '{' and speech_output[-1] == '}':
+            speech_output = soup.find_all("div", {"class":"mod"})[1].get_text()
     except:
         print("Unexpected error:" + str(sys.exc_info()[0]))
         speech_output = "Sorry, I couldn't find an answer to your question"
 
-    should_end_session = False
+    should_end_session = True
 
     return build_response(None, build_speechlet_response(
         card_title, speech_output, None, should_end_session))

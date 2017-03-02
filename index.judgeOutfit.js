@@ -78,7 +78,7 @@ JudgeOutfit.prototype.intentHandlers = {
 
 // Call judgeOutfit endpoint
 function getClothingRec(eventCallback) {
-    var url = "http://54.161.179.203:8042/judge-outfit";
+    var url = "http://104.196.100.15:8042/judge-outfit";
 
     http.get(url, function(res) {
         var body = '';

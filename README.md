@@ -5,7 +5,7 @@ Ask Anything
 ------------
 An Alexa Skill that extends the capabilities of Alexa to run a google search for any question and scraping the results page.  
 
-Trigger Ask Anything by saying, "Alexa, question." Then, proceed to ask it what you want!  
+Trigger Ask Anything by saying, "Alexa, I have a question." Then, proceed to ask it what you want!  
 
 Example questions:  
 - "can you use dish soap in a dishwasher"
