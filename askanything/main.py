@@ -61,6 +61,15 @@ def get_welcome_response():
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
 
+def get_help():
+    session_attributes = {}
+    card_title = "Ask Anything Help"
+    speech_output = "When I say, 'What's up?' Ask any question that you might typically google, for example, 'can I use soap in a dishwasher'? What's up?"
+
+    reprompt_text = speech_output
+    should_end_session = False
+    return build_response(session_attributes, build_speechlet_response(
+        card_title, speech_output, reprompt_text, should_end_session))
 
 def handle_session_end_request():
     card_title = "Question Session Ended"
@@ -84,9 +93,25 @@ def get_answer(intent, session):
     soup = BeautifulSoup(result.text, "html.parser")
     speech_output = ""
     try:
-        speech_output = soup.find_all("div", {"class":"mod"})[0].get_text()
-        if speech_output[0] == '{' and speech_output[-1] == '}':
-            speech_output = soup.find_all("div", {"class":"mod"})[1].get_text()
+        # default text container
+        speech_container = soup.find_all("div", {"class":"mod"})[0]
+
+        # in case the first part is nonsense code
+        if speech_container.get_text().strip()[0] == '{' and speech_container.get_text().strip()[-1] == '}':
+            speech_container = soup.find_all("div", {"class":"mod"})[1]
+
+        # get text from default container
+        speech_output = speech_container.get_text()
+
+        # if asking for numerical stat, append to header
+        stat = soup.find_all("div", {"class":"_XWk"})
+        if len(stat) > 0:
+            speech_output += stat[0].get_text()
+
+        # parse result for unit conversions
+        conversions = speech_container.find_all("input", {"class":"_eif"})
+        if len(conversions) > 0:
+            speech_output = conversions[1].get('value') 
     except:
         print("Unexpected error:" + str(sys.exc_info()[0]))
         speech_output = "Sorry, I couldn't find an answer to your question"
@@ -130,7 +155,7 @@ def on_intent(intent_request, session):
     if intent_name == "AskQuestionIntent":
         return get_answer(intent, session)
     elif intent_name == "AMAZON.HelpIntent":
-        return get_welcome_response()
+        return get_help()
     elif intent_name == "AMAZON.CancelIntent" or intent_name == "AMAZON.StopIntent":
         return handle_session_end_request()
     else:
