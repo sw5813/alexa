@@ -97,7 +97,7 @@ def get_answer(intent, session):
         speech_container = soup.find_all("div", {"class":"mod"})[0]
 
         # in case the first part is nonsense code
-        if speech_container.get_text().strip()[0] == '{' and speech_container.get_text().strip()[-1] == '}':
+        if speech_container.get_text().strip()[0] == '{' or speech_container.get_text().strip()[-1] == '}':
             speech_container = soup.find_all("div", {"class":"mod"})[1]
 
         # get text from default container
@@ -105,7 +105,7 @@ def get_answer(intent, session):
 
         # if asking for numerical stat, append to header
         stat = soup.find_all("div", {"class":"_XWk"})
-        if len(stat) > 0:
+        if len(stat) > 0 and stat[0].get_text() != speech_output:
             speech_output += stat[0].get_text()
 
         # parse result for unit conversions
